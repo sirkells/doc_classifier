@@ -1,32 +1,30 @@
 {% extends "layout.html" %}
+{% block message %}
+    {{ clean }}
+{% endblock %}
 {% block title %}Results{% endblock %}
 
-{% block message %}
-    {{  }}
-{% endblock %}
 
 {% block content %}
         <h1 class="text-center">Outcome</h1>
             <ul class="list-group">
                 
-                {% if labels %}
-                    {% for label in labels %}
-                    <li class="list-group-item list-group-item-primary text-center">The project could be {{label}} </li>
-                    <li class="list-group-item list-group-item-primary text-center">The project could also be {{label}} </li>
-                    {% endfor %}
+                {% if query %}
+                    <li class="list-group-item list-group-item-primary text-center">The project is predicted to be {{labels[0]}} </li>
+                    <li class="list-group-item list-group-item-primary text-center">The project could also be {{labels[1]}} </li>
                 {% endif %}
                 <br>
                 <br>
                 
                 <div class="list-group">
-                    {% if recommended_projects %}
                     <h1 class="text-center">Recommendations</h1>
-                        {% for project in recommended_projects['title'] %}
+
+                    {% if not recommended_projects.empty %}
+                        {% for project in recommended_projects['title'][:10] %}
                             <div class="card-deck">
                                     <div class="card">
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ recommended_projects['title'][project] }}</h5>
-                                        <p class="card-text">{{  recommended_projects['description'][project][100:300] }}</p>
+                                        <h5 class="card-title">{{project}}</h5>
                                     </div>
                                     <div class="card-footer">
                                         
@@ -35,6 +33,7 @@
                             </div>
                         {% endfor %}
                     {% endif %}
+
 
 
 {% endblock %}

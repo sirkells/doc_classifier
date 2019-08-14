@@ -178,10 +178,10 @@ def tokenize_ul(text):
     stemmer_germ = SnowballStemmer("german", ignore_stopwords=True) 
     try:
         # Convert text to lowercase and remove punctuation
-        #text = re.sub("[^a-zA-Z ]", " ", text.lower()) #remove non alphbetic text
+        text = re.sub("[^a-zA-Z ]", " ", text.lower()) #remove non alphbetic text
         #text = re.sub(r'\b\d+(?:\.\d+)?\s+', ' ', text.lower())
-        text = re.sub(r'(\d)',' ',text.lower())
-        text = re.sub('[%s]' % re.escape(string.punctuation), ' ', text)
+        #text = re.sub(r'(\d)',' ',text.lower())
+        #text = re.sub('[%s]' % re.escape(string.punctuation), ' ', text)
         #text = re.sub(r'[^\w\s]',' ',text)
         # Tokenize words
         #tokens = word_tokenize(text)

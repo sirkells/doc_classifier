@@ -1,13 +1,19 @@
-version: '2'
+version: "3.7"
+
 services:
-  web:
-    container_name: project_classifier
+
+  doc_classifier:
+    build: ./app
+    container_name: doc_classifier
     restart: always
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    command: []
+    environment:
+      - APP_NAME=DocClassifierApp
+    expose:
+      - 3000
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
     ports:
-      - "3000:80"
-    volumes:
-      - ./app:/app
+      - "3000:3000"
