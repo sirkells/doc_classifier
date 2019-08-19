@@ -8,12 +8,6 @@ services:
     restart: always
     environment:
       - APP_NAME=DocClassifierApp
-    expose:
-      - 3000
-
-  nginx:
-    build: ./nginx
-    container_name: nginx
-    restart: always
     ports:
-      - "3000:3000"
+      - "3000:3001"
+

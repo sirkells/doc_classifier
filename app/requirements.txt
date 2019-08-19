@@ -6,7 +6,7 @@ chardet==3.0.4
 Click==7.0
 docutils==0.14
 Flask==1.1.1
-gensim==3.8.0
+gensim==3.4.0
 idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.10.1
@@ -15,7 +15,7 @@ joblib==0.13.2
 MarkupSafe==1.1.1
 nltk==3.4.4
 numpy==1.16.4
-pandas
+pandas==0.25.0
 python-dateutil==2.8.0
 pytz==2019.1
 requests==2.22.0
