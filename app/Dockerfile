@@ -9,5 +9,7 @@ WORKDIR /app/
 RUN pip install -r requirements.txt
 RUN python3 -m nltk.downloader punkt
 RUN python3 -m nltk.downloader wordnet
-# run the command to start uWSGI
+
 CMD ["python", "main.py"]
+EXPOSE 0.0.0.0:3001:3001/tcp 
+

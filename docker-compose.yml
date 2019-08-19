@@ -9,7 +9,7 @@ services:
     environment:
       - APP_NAME=DocClassifierApp
     ports:
-      - "3000:3001"
+      - "3001:3001"
     volumes: 
       - './app:/app'
 
