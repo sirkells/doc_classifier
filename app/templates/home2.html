@@ -1,40 +1,55 @@
 {% extends "layout.html" %}
-{% block message %}
-    {{ clean }}
-{% endblock %}
-{% block title %}Results{% endblock %}
-
 
 {% block content %}
-        <h1 class="text-center">Outcome</h1>
-            <ul class="list-group">
-                
-                {% if query %}
-                    <li class="list-group-item list-group-item-primary text-center">The project is predicted to be {{labels[0]}} </li>
-                    <li class="list-group-item list-group-item-primary text-center">The project could also be {{labels[1]}} </li>
-                {% endif %}
-                <br>
-                <br>
-                
-                <div class="list-group">
-                    <h1 class="text-center">Recommendations</h1>
+<div class="card text-center">
+    <div class="card-body">
+        <h1 class="text-center">Project Classification Prediction</h1>
+        <p class="text-center">Predicts a project category</p>
+        <div class="row">
+            <div class="col-lg-12 form-group-lg">
+                <form action="/home" method="get">
+                    <div class="form-group">
+                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="5" name="query" placeholder="Enter a project to predict its category"></textarea>
+                    </div>
+                    <div class="col-lg-offset-5 text-center">
+                        <button type="submit" class="btn btn-lg btn-primary">Predict</button>
+                        <a href="{{ url_for('home') }}"><button class="btn btn-lg btn-danger">Refresh</button></a>
+                    </div>
+                </form>
+            </div>
+            <br>
+        {{ cleaned_text }}
+        </div>
+    </div>
+</div>
+{% if valid_query %}
+<h1 class="text-center">Outcome</h1>
+    <ul class="list-group">
+        <li class="list-group-item list-group-item-primary text-center">The project is predicted to be {{labels[0]}} </li>
+        <li class="list-group-item list-group-item-primary text-center">The project could also be {{labels[1]}} </li>
 
-                    {% if not recommended_projects.empty %}
-                        {% for project in recommended_projects['title'][:10] %}
-                            <div class="card-deck">
-                                    <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{project}}</h5>
-                                    </div>
-                                    <div class="card-footer">
-                                        
-                                    </div>
-                                    </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+    <br>
+    <br>
+    
+    <div class="list-group">
+        <h1 class="text-center">Recommendations</h1>
 
+        {% if not recommended_projects.empty %}
+            {% for project in recommended_projects['title'][:10] %}
+                <div class="card-deck">
+                        <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{project}}</h5>
+                        </div>
+                        <div class="card-footer">
+                            
+                        </div>
+                        </div>
+                </div>
+            {% endfor %}
+        {% endif %}
 
+{% endif %}
 
 {% endblock %}
 
