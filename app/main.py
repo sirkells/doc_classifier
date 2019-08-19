@@ -28,278 +28,104 @@ app = Flask(__name__)
 
 
 #load target data
-loaded_target = joblib.load('models/target.sav')
-stopwords_ul = joblib.load('models/stopwords.sav')
-stopwords_sl = joblib.load('models/stopwords_sl')
-#print(type(stopwords))
-# Stem word tokens and remove stop words
-stemmer_eng = SnowballStemmer("english", ignore_stopwords=True)
-stemmer_germ = SnowballStemmer("german", ignore_stopwords=True) 
+pickle_in = open('App-Model/stopwords_all.pickle',"rb")
+stopwords_all = pickle.load(pickle_in)
 
 
 # Get Dictionary of the Trained Data
-with open('models/dictionary', 'rb') as data:
+with open('App-Model/dictionary', 'rb') as data:
     dictionary = pickle.load(data)
 
 # Get Projects data
-with open('models/APP_DATA.sav', 'rb') as data:
+with open('App-Model/df', 'rb') as data:
     projects = pickle.load(data)
 
+#projects.drop_duplicates(subset='description', inplace=True)
 #Get corpus 
-with open('models/corpus', 'rb') as data:
+with open('App-Model/corpus', 'rb') as data:
     corpus = pickle.load(data)
 
-# Load a potentially pretrained model from disk.
-#lda_model = LdaModel.load('models/model_tm', mmap='r')
+#load flatlist of skills
+with open('App-Model/flatlist', 'rb') as data:
+    all_skills = pickle.load(data)
+
 
 # later on, load trained model from file
-lda_model =  models.LdaModel.load('models/lda.model')
+lda_model =  models.LdaModel.load('App-Model/converted_model_skills_title_26_pref')
 all_topic_distr_list = lda_model[corpus]
 
-target_labels = ['Data-Engr-Big Data','Data-Sci-BI','Dev-Devops','Dev-Web-Backend','Dev-Web-Frontend','Dev-Web-Fullstack','ERP-SAP','IT-Admin-Others','IT-Mgmt-Consulting','IT-Mgmt-Projectleiter','IT-Technical-Dev','IT/Elektrotechn','Infr-Admin-Database','Infr-Admin-Linux','Infr-Admin-Microsoft','Infr-Admin-Net','Infr-Database-Admin','SW-Dev-Mobile','SW-Dev-Others']
+topic_names =  ["IT_Support", "HW_Tech_Embedded","PM_Support","SW_Arch","SW_Dev_Java", "PM_Projectleiter","SAP_Mgt","SW_Dev_Web","PM","SW_Test/Quality_Engr",
+               "DevOps", "SW_Arch/Cloud","Consultant_SAP","SW_Dev_Web", "Business_Analyst/BI","PM_Mkt_Vertrieb","IT_Admin", "SW_Dev_Mobile/UI_Design","Infra_Server_Admin",
+               "DB_Dev_Admin","IT_Consultant","Infra_Network_Admin","Data_Engr","SW_Dev_Web","SW_Dev_Web_Frontend","IT_Consultant_Operations"]
 
-
-# z = ['nachverfolgung', 'implement', 'organisation', 'lasse', 'ten',  'durchf', 'hinsichtlich', 'suse', 'bersetzung', 'berpr', 'ts', 'auszuf', 'win', 'fung', 'grundlegende', 'sung',  'aufwand',  'vereinbarung', 'liefereinheiten', 'nachbesserung', 'hrende', 'ergebisse', 'aktivit', 'implementierung', 'qualit', 'hrungsverantwortung', 'organisations']
-# w = ['august', 'flexibel', 'tzung', 'ngerungsoption', 'ige', 'stammkunden', 'absprache', 'hierf', 'langfristig', 'hauptaufgabe', 'regelm', 'fachabteilung']
-# x = ['datenschutzbestimmungen',  'nintex', 'rechte',  'arbeitnehmer', 'entnehmen', 'workflows', 'rechtsform', 'forms', 'verf', 'robotersteuerung',  'workflow', 'gung', 'elisabeth', 'umfang', 'sicherstellen', 'konzipieren', 'aracom', 'personalreferentin', 'bedienbarkeit', 'realisieren', 'besch', 'funktionen', 'insb', 'ftigen', 'ndige', 'personenbezogenen', 'individual', 'oberfl', 'ssig', 'berechtigungsstruktur', 'hemmerle', 'verarbeitung', 'einbezug',  'che', 'benutzerfreundlichen', 'sozialversicherungspflichtige']
-# y = ['dealership', 'professsional', 'create', 'motivation', 'invision', 'higkeit', 'ssigkeit', 'gesuchte', 'sale', 'selbstst', 'point', 'teamf', 'ideal', 'figma', 'zuverl', 'desi', 'verhandlungssicher', 'ndiges', 'sprachanforderungen', 'erweiterte', 'sketch', 'first', 'tigkeiten']
-# j = ['improve', 'period', 'financial', 'full', 'hearing', 'current', 'live', 'initial', 'term',  'long', 'scratch', 'look',   'minimum', 'build', 'get', 'reviews', 'profile', 'codebase', 'someone',  'help', 'forward', 'soon', 'features', 'offer', 'week', 'available', 'however', 'days', 'legacy',  'instance', 'position', 'superceding']
-# update_stopwords = [ 'unterhalten', 'mitarbeitern', 'plattform', 'load', 'verteilten', 'sprintwechsel', 'streamingdienstes', 'gew',  'wochen', 'plattformen', 'owner', 'orientiert', 'betreuen', 'nschenswert', 'rhythmus', 'infrastructure', 'erarbeiten', 'prometheus', 'arbeitsweise', 'tzen', 'aufbau', 'bevorzugt', 'unterst', 'lifecycle', 'mittwoch', 'arbeit', 'donnerstag','freitag', 'montag', 'dienstag', 'reibungslosen', 'nnen', 'spiel', 'gro', 'enth', 'nutzer', 'konzernen', 'umgebungen', 'dot', 'thrivenow', 'startups', 'kollegen', 'passt',  'gbaren', 'nachricht', 'refinement', 'thrive', 'jeweils',  'abdecken', 'termine', 'frameworks', 'logik', 'sprintdauer', 'balancing', 'anbietern', 'festangestellten', 'liebe', 'teamgeist', 'anbietet',  'internen', 'wochentagen', 'kreativit', 'metric', 'aufgabenstellung', 'unterwegs', 'nchen', 'erweitert', 'everything', 'reichen', 'bereit', 'uptimes', 'parallelen', 'haupts', 'projektbezogener', 'daily',  'session', 'testl', 'credo',  'sungen',  'basierend', 'loggregator', 'nscht', 'bestehend', 'hochverf', 'thema', 'chlich', 'hrige', 'dominic', 'performance', 'freelancern', 'mehrj', 'fluentd', 'min']
-# #stopwords = stopwords + update_stopwords + w + y + z + x + j
-
-# ab = ['entwick', 'automat', 'scrum']
-av = {
-    'entwick': 'entwicklung',
-    'automat': 'automate',
-    'scrum': 'scrum',
-    'container': 'containerization',
-    'admin': 'administration',
-    'analys': 'analyst',
-    'softwar': 'software',
-    'app': 'application',
-    'developer': 'entwicklung',
-    'programming': 'entwicklung',
-    'mobil': 'mobil',
-    'cisco': 'cisco'
-}
-# def tokenize(text):
-#     """Normalize, tokenize and stem text string
-    
-#     Args:
-#     text: string. String containing message for processing
-       
-#     Returns:
-#     stemmed: list of strings. List containing normalized and stemmed word tokens
-#     """
-
-#     try:
-#         # Convert text to lowercase and remove punctuation
-#         text = re.sub("[^a-zA-Z ]", " ", text.lower()) #remove non alphbetic text
-#         # Tokenize words
-#         tokens = word_tokenize(text)
-#         #stemmed = [stemmer_germ.stem(word) for word in tokens if word not in stopwords]
-#         #stemmed = [stemmer_eng.stem(word) for word in stemmed if len(word) > 1]
-#         stemmed = [word for word in tokens if word not in stopwords and len(word) > 1]
-        
-#         for index, word in enumerate(stemmed):
-#             for key, value in av.items():
-#                 if key in word:
-#                     stemmed[index] = value
-        
-#         #duplicates = list(set(stemmed))
-#     except IndexError:
-#         pass
-
-#     return stemmed
-
-wnl = WordNetLemmatizer()
-
-def penn2morphy(penntag):
-    """ Converts Penn Treebank tags to WordNet. """
-    morphy_tag = {'NN':'n', 'JJ':'a',
-                  'VB':'v', 'RB':'r'}
-    try:
-        return morphy_tag[penntag[:2]]
-    except:
-        return 'n' 
-    
-def lemmatize_sent(text): 
-    # Text input is string, returns lowercased strings.
-    return [wnl.lemmatize(word.lower(), pos=penn2morphy(tag)) 
-            for word, tag in pos_tag(word_tokenize(text))]
-
-lemmatize_sent('He is walking to school')
-
+clean = None
 import string
 from string import punctuation
-def tokenize(text):
-    """Normalize, tokenize and stem text string
+from gensim.utils import SaveLoad
+load_bigrams = SaveLoad.load('App-Model/bigram_skills_title')
+
+def text_processing(text):
+    """Normalize, tokenize, stem the original text string
     
     Args:
     text: string. String containing message for processing
        
     Returns:
-    stemmed: list of strings. List containing normalized and stemmed word tokens
+    cleaned: list of strings. List containing normalized and stemmed word tokens with bigrams
     """
-    # Stem word tokens and remove stop words
-    stemmer_eng = SnowballStemmer("english", ignore_stopwords=True)
-    stemmer_germ = SnowballStemmer("german", ignore_stopwords=True) 
+
     try:
-        # Convert text to lowercase and remove punctuation
-        #text = re.sub("[^a-zA-Z ]", " ", text.lower()) #remove non alphbetic text
         text = re.sub(r'(\d)',' ',text.lower())
         text = re.sub('[%s]' % re.escape(string.punctuation), ' ', text)
-        # Tokenize words
-        #tokens = word_tokenize(text)
-        #print(tokens)
-        
         tokens = word_tokenize(text)
-        stemmed = [stemmer_germ.stem(word) for word in tokens if word not in stopwords_sl]
-        stemmed = [word for word in stemmed if len(word) > 1]
-        #stemmed = [word for word in tokens if word not in stopwords and len(word) > 1]
-        
-        
-        #stemmed = [word for word in stemmed if word not in stopwords and len(word) > 2]
+        tokens_cleaned = [word for word in tokens if word not in stopwords_all and len(word) > 1]
+        bigrams_tokens = load_bigrams[tokens_cleaned]
+        tokens = list({token for token in bigrams_tokens if token in all_skills})
     except IndexError:
         pass
 
-    return stemmed
-def tokenize_ul(text):
-    """Normalize, tokenize and stem text string
-    
-    Args:
-    text: string. String containing message for processing
-       
-    Returns:
-    stemmed: list of strings. List containing normalized and stemmed word tokens
-    """
-    # Stem word tokens and remove stop words
-    #stemmer_eng = SnowballStemmer("english", ignore_stopwords=True)
-    stemmer_germ = SnowballStemmer("german", ignore_stopwords=True) 
-    try:
-        # Convert text to lowercase and remove punctuation
-        text = re.sub("[^a-zA-Z ]", " ", text.lower()) #remove non alphbetic text
-        #text = re.sub(r'\b\d+(?:\.\d+)?\s+', ' ', text.lower())
-        #text = re.sub(r'(\d)',' ',text.lower())
-        #text = re.sub('[%s]' % re.escape(string.punctuation), ' ', text)
-        #text = re.sub(r'[^\w\s]',' ',text)
-        # Tokenize words
-        #tokens = word_tokenize(text)
-        #print(tokens)
-        
-        tokens = word_tokenize(text)
-        stemmed = [stemmer_germ.stem(word) for word in tokens if word not in stopwords_ul]
-        stemmed = [word for word in stemmed if len(word) > 1]
-        #stemmed = [word for word in stemmed if word not in stopwords_ul and len(word) > 1]
-        
-        
-        #stemmed = [word for word in stemmed if word not in stopwords and len(word) > 2]
-    except IndexError:
-        pass
-
-    return stemmed
-def clean_lower_tokenize(text):
-    """
-    Function to clean, lower and tokenize texts
-    Returns a list of cleaned and tokenized text
-    """
-    #text = re.sub("((\S+)?(http(s)?)(\S+))|((\S+)?(www)(\S+))|((\S+)?(\@)(\S+)?)", " ", text)  #remove websites texts like email, https, www
-    text = re.sub("[^a-zA-Z ]", "", text) #remove non alphbetic text
-    text = text.lower() # lower case the text
-    text = nltk.word_tokenize(text)
-    return text
-
-def remove_stop_words(text):
-    """
-    Function that removes all stopwords from text
-    """
-    return [word for word in text if word not in stopwords_ul]
-
-def stem_eng_german_words(text):
-    """
-    Function to stem words
-    """
-    try:
-        text = [stemmer_germ.stem(word) for word in text]
-        #text = [stemmer_eng.stem(word) for word in text]
-        text = [word for word in text if len(word) > 1] 
-    except IndexError:
-        pass
-    return text
-
-def all_processing(text):
-    """
-    This function applies all the functions above into one
-    """
-    return stem_eng_german_words(remove_stop_words(clean_lower_tokenize(text)))
+    return tokens
 
 
-
-# load model
-model = joblib.load("models/new_model")
-
-
-def get_category(text, model, labels):
-    predicted = model.predict([text])[0]
-    results = dict(zip(labels.columns, predicted))
-    return results
-def get_category_prob(text, model, labels):
-    predicted_prob_distr = model.predict_proba([text])
-    results = [val[0][1] for val in predicted_prob_distr]
-    predicted_index = np.argmax(results)
-    prediction_percentage = max(results)
-    return labels[predicted_index], prediction_percentage
-    
 def percentage(data):
     total = np.sum(data)
     perc_arr = np.array([(x/total)*100 for x in data])
     return perc_arr
-# index webpage displays cool visuals and receives user input text for model
 
-def predict_bereich(text, lda_model):
-    clean = tokenize_ul(text)
-    text_bow = dictionary.doc2bow(clean)
-    topic_distr_array = np.array([topic[1] for topic in lda_model.get_document_topics(bow=text_bow)])
-    labels_array_percent = percentage(topic_distr_array)
-    print(labels_array_percent)
-    labels_array =labels_array_percent.argsort()[-2:][::-1]
-    print(topic_distr_array)
-    return labels_array, labels_array_percent, clean
-def js_similarity_score(doc_distr_query, corpus_distr):
-    """
-    This function finds the similarity score of a given doc accross all docs in the corpus
-    It takes two parameters: doc_distr_query and corpus_distr
-    (1) doc_distr_query is the input document query which is an LDA topic distr: list of floats (series)
-            [1.9573441e-04,...., 2.7876711e-01]
-    (2) corpus_dist is the target corpus containing the LDA topic distr of all documents in the corpus: lists of lists of floats (vector)
-            [[1.9573441e-04, 2.7876711e-01, 1.9573441e-04]....[1.9573441e-04,...., 2.7876711e-01]]
-    It returns an array containing the similarity score of each document in the corpus_dist to the input doc_distr_query
-    The output looks like this: [0.3445, 0.35353, 0.5445,.....]
+def predict_bereich(text, model=lda_model, topics=topic_names):
+    #dictionary.add_documents([text_processing(text)])
+    global clean 
+    clean = text_processing(text)
+    bow = dictionary.doc2bow(clean)
+    #print(text_processing(text))
+    #model.update([bow])
+    # get the topic contributions for the document chosen at random above
+    topic_dist = model.get_document_topics(bow=bow)
+    doc_distribution = np.array([topic[1] for topic in topic_dist])
     
-    """
-    input_doc = doc_distr_query[None,:].T #transpose input
-    corpus_doc = corpus_distr.T # transpose corpus
-    m = 0.5*(input_doc + corpus_doc)
-    sim_score = np.sqrt(0.5*(entropy(input_doc,m) + entropy(corpus_doc,m)))
-    return sim_score
-def find_top_similar_docs(doc_distr_query, corpus_distr,n=10):
-    """
-    This function returns the index lists of the top n most similar documents using the js_similarity_score
-    n can be changed to any amount desired, default is 10
-    """
-    sim_score = js_similarity_score(doc_distr_query, corpus_distr)
-    similar_docs_index_array = sim_score.argsort()[:n] #argsort sorts from lower to higher
-    return similar_docs_index_array
+    labels_array_percent = percentage(doc_distribution)
+    #print(labels_array_percent)
+    labels_array =labels_array_percent.argsort()[-3:][::-1]
+    #print(topic_dist)
+    
+    index = doc_distribution.argmax()
+    topic1 = topics[labels_array[0]]
+    topic2 = topics[labels_array[1]]
+    topic3 = topics[labels_array[2]]
 
-def recommend(text):
-    clean = tokenize_ul(text)
-    text_bow = dictionary.doc2bow(clean)
-    new_doc_distribution = np.array([tup[1] for tup in lda_model.get_document_topics(bow=text_bow)])
-    corpus_topic_dist= np.array([[topic[1] for topic in docs] for docs in all_topic_distr_list])
-    similar_docs_index = find_top_similar_docs(new_doc_distribution, corpus_topic_dist, 10)
-    top_sim_doc = projects[projects.index.isin(similar_docs_index)]
-    PROJECT_DICT = top_sim_doc.to_dict() 
-    return PROJECT_DICT
+    #print(labels_array[0], labels_array[1])
+    #result = f'The project seems to be => {topic1} but could also be => {topic2}'
+    #return result, topic1,topic2
+    return topic1, topic2, topic3
+    
+def predict_and_recommend(text_data):
+    bereich= predict_bereich(text_data)
+    rec_projects1 = projects[projects['category3'] == bereich]
+    rec_projects2 = projects[projects['category2'] == bereich[:2]]
+    combined_recommendations = pd.concat([rec_projects1, rec_projects2], ignore_index=True)
+    combined_recommendations.drop_duplicates(subset='description', inplace=True)
+
+    return bereich, combined_recommendations
 
 
 @app.route("/")
@@ -308,37 +134,25 @@ def home():
     # save user input in query
     #print(type(stopwords))
     query = request.args.get('query', '')
-    labels, labels_perc, new_data = predict_bereich(query, lda_model)
-    recommended_projects = recommend(query)
-    #print(recommended_projects)
-    # use model to predict classification for query
-    output = get_category_prob(query, model, target_labels)
-    #print(labels)
-    index_highest = labels_perc.argmax()
-    group = ['ERP/SAP','SW_Dev/Web','SW_Dev/Arch','SW_Dev/DevOps','Sys_Admin/Support', 'SW_Dev/Mobile/support','Data/Ops','IT_Process_Mgr/Consultant', 'MS_DEV/Admin','Business_Analyst/Consulting']
-    #dictOfWords = { i : other_labels[i] for i in range(0, len(other_labels) ) }
-    # This will render the go.html Please see that file. 
-    if labels_perc[index_highest] < 20:
+    labels, recommended_projects = predict_and_recommend(query)
+    if len(query) < 30:
         query = 'Please enter a valid text'
         return render_template(
-        'home.html',
+        'home2.html',
         query=query,
-        output={},
         labels={},
-        group={}
+        group={},
+        recommended_projects= pd.DataFrame(columns=['Text', 'title', 'description'])
     )
     else:
-        
-        return render_template(
-            'home.html',
-            query=query,
-            output=output,
-            labels=labels,
-            group=group,
-            topic_distr=labels_perc,
-            recommended_projects=recommended_projects,
-            new_data=new_data
-        )
+    	return render_template(
+       	'home2.html',
+       	query=query,
+        clean=clean,
+        labels=labels,
+        group=topic_names,
+        recommended_projects=recommended_projects
+    )
 
 @app.route("/about/")
 def about():
