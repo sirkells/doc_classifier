@@ -1,7 +1,7 @@
 variables:
   APP_VERSION: '0.1'
   BRANCH_NAME: $CI_COMMIT_REF_NAME
-  IMAGE_NAME: $CI_PROJECT_NAME
+  IMAGE_NAME: 'doc-classifier'
   APP_PATH: 'apps'
 
 stages:
