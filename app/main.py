@@ -1,16 +1,20 @@
 import json, re
 import pandas as pd
-from flask import Flask, flash
+from flask import Flask, flash, Blueprint
 from flask import render_template, request, jsonify
 import re, pickle
 import time, os
 
 
-from models import predict_and_recommend, topic_names, text_processing
+from models import predict_and_recommend, topic_names, text_processing, PrefixMiddleware
 
+#bp = Blueprint('doc_clasifier', __name__, template_folder='templates')
 app = Flask(__name__)
-app.config["APPLICATION_ROOT"] = os.environ.get('SUB_PATH')
+#app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
+#app.config["APPLICATION_ROOT"] = os.environ.get('SUB_PATH')
 app.secret_key = 'secret'
+app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
+
 
 @app.route("/")
 @app.route('/home')
