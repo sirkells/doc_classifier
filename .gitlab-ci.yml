@@ -23,6 +23,8 @@ deploy:
   script:
     - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
     - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
+  except:
+    - master
 
 cleanup:
   stage: post
@@ -36,9 +38,10 @@ tag_latest:
   tags:
     - shared
   script:
-    - docker tag docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
-    - docker tag docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
-    - docker rmi docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
+    - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
+    - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
+    - docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
+    - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
   only:
     - master
 
