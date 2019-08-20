@@ -1,0 +1,36 @@
+variables:
+  APP_VERSION: '0.1'
+  BRANCH_NAME: $CI_COMMIT_REF_NAME
+  IMAGE_NAME: $CI_PROJECT_NAME
+  APP_PATH: 'apps'
+
+stages:
+  - build
+  - deploy
+  - post
+
+build:
+  stage: build
+  script:
+    - docker build -t $IMAGE_NAME:build-$CI_PIPELINE_ID .
+
+deploy:
+  stage: deploy
+  script:
+    - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
+    - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
+
+cleanup:
+  stage: post
+  script:
+    - docker rmi $IMAGE_NAME:build-$CI_PIPELINE_ID
+
+tag_latest:
+  stage: post
+  script:
+    - docker tag docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
+    - docker tag docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
+    - docker rmi docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
+  only:
+    - master
+
