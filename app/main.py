@@ -3,12 +3,13 @@ import pandas as pd
 from flask import Flask, flash
 from flask import render_template, request, jsonify
 import re, pickle
-import time
+import time, os
 
 
 from models import predict_and_recommend, topic_names, text_processing
 
 app = Flask(__name__)
+app.config["APPLICATION_ROOT"] = os.environ.get('SUB_PATH')
 app.secret_key = 'secret'
 
 @app.route("/")

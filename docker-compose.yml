@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3"
 
 services:
 
@@ -8,6 +8,7 @@ services:
     restart: always
     environment:
       - APP_NAME=DocClassifierApp
+      - SUB_PATH=/prod/doc_classifier
     ports:
       - "3001:3001"
     volumes: 
