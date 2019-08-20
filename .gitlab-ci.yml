@@ -14,7 +14,7 @@ build:
   tags:
     - shared
   script:
-    - docker build -t $IMAGE_NAME:build-$CI_PIPELINE_ID .
+    - docker build -t $IMAGE_NAME:build-$CI_PIPELINE_ID ./app
 
 deploy:
   stage: deploy
