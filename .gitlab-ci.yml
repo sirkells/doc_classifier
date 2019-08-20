@@ -1,7 +1,7 @@
 variables:
   APP_VERSION: '0.1'
   BRANCH_NAME: $CI_COMMIT_REF_NAME
-  IMAGE_NAME: 'doc-classifier'
+  IMAGE_NAME: $CI_PROJECT_NAME
   APP_PATH: 'apps'
 
 stages:
@@ -26,13 +26,6 @@ deploy:
   except:
     - master
 
-cleanup:
-  stage: post
-  tags:
-    - shared
-  script:
-    - docker rmi $IMAGE_NAME:build-$CI_PIPELINE_ID
-
 latest:
   stage: deploy
   tags:
@@ -40,8 +33,14 @@ latest:
   script:
     - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
     - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
-    - docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
+    - docker tag docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
     - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
   only:
     - master
 
+cleanup:
+  stage: post
+  tags:
+    - shared
+  script:
+    - docker rmi $IMAGE_NAME:build-$CI_PIPELINE_ID
