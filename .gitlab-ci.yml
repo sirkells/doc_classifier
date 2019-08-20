@@ -11,22 +11,30 @@ stages:
 
 build:
   stage: build
+  tags:
+    - shared
   script:
     - docker build -t $IMAGE_NAME:build-$CI_PIPELINE_ID .
 
 deploy:
   stage: deploy
+  tags:
+    - shared
   script:
     - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
     - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
 
 cleanup:
   stage: post
+  tags:
+    - shared
   script:
     - docker rmi $IMAGE_NAME:build-$CI_PIPELINE_ID
 
 tag_latest:
   stage: post
+  tags:
+    - shared
   script:
     - docker tag docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
     - docker tag docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
