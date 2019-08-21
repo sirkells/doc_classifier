@@ -10,24 +10,30 @@ from models import predict_and_recommend, topic_names, text_processing, PrefixMi
 
 PREFIX = '/prod/doc_classifier'
 #bp = Blueprint('doc_clasifier', __name__, template_folder='templates')
-app = Flask(__name__)
 #app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
-#app.config["APPLICATION_ROOT"] = os.environ.get('SUB_PATH')
-app.secret_key = 'secret'
+subpath = os.environ.get('SUB_PATH')
+
+
 #app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
 #app.route = prefix_route(app.route, PREFIX)
+app = Flask(__name__)
+#app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
+app.secret_key = 'secret'
 
+def get_path(name):
+    subpath = os.environ.get('SUB_PATH')
+    route = url_for(name)
+    fullpath = subpath + route
+    return fullpath
+
+app.jinja_env.globals.update(get_path=get_path)
 
 
 @app.route("/")
-def index():
-    return redirect(url_for("home"))
-
-@app.route(PREFIX + "/")
-@app.route(PREFIX + '/home')
+@app.route('/home')
 def home():
     # save user input in query
-    #print(type(stopwords))
+    print(subpath)
     query = request.args.get('query', '')
     labels, recommended_projects = predict_and_recommend(query)
     valid_query = True if len(query) > 30 else False
@@ -56,9 +62,11 @@ def home():
     )
     	
 
-@app.route(PREFIX + "/about")
+@app.route("/about")
 def about():
     return render_template("about.html")
+
+
 
 def main():
     app.run(host='0.0.0.0', port=3001, debug=False)
