@@ -6,19 +6,26 @@ import re, pickle
 import time, os
 
 
-from models import predict_and_recommend, topic_names, text_processing, PrefixMiddleware
+from models import predict_and_recommend, topic_names, text_processing, PrefixMiddleware, prefix_route
 
+PREFIX = '/prod/doc_classifier'
 #bp = Blueprint('doc_clasifier', __name__, template_folder='templates')
 app = Flask(__name__)
 #app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
 #app.config["APPLICATION_ROOT"] = os.environ.get('SUB_PATH')
 app.secret_key = 'secret'
-app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
+#app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
+app.route = prefix_route(app.route, PREFIX)
+
 
 
 @app.route("/")
 def index():
-    return redirect(url_for('home'))
+    return redirect(url_for("home"))
+
+@app.route("/test")
+def test():
+    return redirect(url_for("about"))
 @app.route('/home')
 def home():
     # save user input in query
