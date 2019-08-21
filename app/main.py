@@ -30,6 +30,9 @@ app.jinja_env.globals.update(get_path=get_path)
 
 
 @app.route("/")
+def index():
+    return redirect(url_for("home"))
+@app.route(PREFIX + '/home')
 @app.route('/home')
 def home():
     # save user input in query
@@ -62,6 +65,7 @@ def home():
     )
     	
 
+@app.route(PREFIX + "/about")
 @app.route("/about")
 def about():
     return render_template("about.html")
