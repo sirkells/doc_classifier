@@ -15,7 +15,7 @@ app = Flask(__name__)
 #app.config["APPLICATION_ROOT"] = os.environ.get('SUB_PATH')
 app.secret_key = 'secret'
 #app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
-app.route = prefix_route(app.route, PREFIX)
+#app.route = prefix_route(app.route, PREFIX)
 
 
 
@@ -23,10 +23,8 @@ app.route = prefix_route(app.route, PREFIX)
 def index():
     return redirect(url_for("home"))
 
-@app.route("/test")
-def test():
-    return redirect(url_for("about"))
-@app.route('/home')
+@app.route(PREFIX + "/")
+@app.route(PREFIX + '/home')
 def home():
     # save user input in query
     #print(type(stopwords))
@@ -58,7 +56,7 @@ def home():
     )
     	
 
-@app.route("/about")
+@app.route(PREFIX + "/about")
 def about():
     return render_template("about.html")
 
