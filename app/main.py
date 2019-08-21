@@ -1,7 +1,7 @@
 import json, re
 import pandas as pd
 from flask import Flask, flash, Blueprint
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, url_for, redirect
 import re, pickle
 import time, os
 
@@ -17,6 +17,8 @@ app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
 
 
 @app.route("/")
+def index():
+    return redirect(url_for('home'))
 @app.route('/home')
 def home():
     # save user input in query
