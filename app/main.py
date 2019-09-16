@@ -20,13 +20,13 @@ app = Flask(__name__)
 #app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
 app.secret_key = 'secret'
 
-def get_path(name):
-    subpath = os.environ.get('SUB_PATH')
-    route = url_for(name)
-    fullpath = subpath + route
-    return fullpath
+#def get_path(name):
+ #   subpath = os.environ.get('SUB_PATH')
+  #  route = url_for(name)
+    #fullpath = subpath + route
+   # return fullpath
 
-app.jinja_env.globals.update(get_path=get_path)
+#app.jinja_env.globals.update(get_path=get_path)
 
 
 #@app.route("/")
