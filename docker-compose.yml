@@ -11,6 +11,5 @@ services:
       - SUB_PATH=/prod/doc_classifier
     ports:
       - "3001:3001"
-    volumes: 
+    volumes:
       - './app:/app'
-

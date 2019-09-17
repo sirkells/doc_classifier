@@ -160,10 +160,10 @@ from string import punctuation
 
 def tokenize(text):
     """Normalize, tokenize and stem text string
-    
+
     Args:
     text: string. String containing message for processing
-       
+
     Returns:
     stemmed: list of strings. List containing normalized and stemmed word tokens
     """
@@ -195,10 +195,10 @@ def tokenize(text):
 
 def tokenize_ul(text):
     """Normalize, tokenize and stem text string
-    
+
     Args:
     text: string. String containing message for processing
-       
+
     Returns:
     stemmed: list of strings. List containing normalized and stemmed word tokens
     """
@@ -319,7 +319,7 @@ def js_similarity_score(doc_distr_query, corpus_distr):
             [[1.9573441e-04, 2.7876711e-01, 1.9573441e-04]....[1.9573441e-04,...., 2.7876711e-01]]
     It returns an array containing the similarity score of each document in the corpus_dist to the input doc_distr_query
     The output looks like this: [0.3445, 0.35353, 0.5445,.....]
-    
+
     """
     input_doc = doc_distr_query[None, :].T  # transpose input
     corpus_doc = corpus_distr.T  # transpose corpus

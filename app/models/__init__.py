@@ -76,10 +76,10 @@ load_bigrams = SaveLoad.load("App-Model/bigram_skills_title")
 
 def text_processing(text):
     """Normalize, tokenize, stem the original text string
-    
+
     Args:
     text: string. String containing message for processing
-       
+
     Returns:
     cleaned: list of strings. List containing normalized and stemmed word tokens with bigrams
     """

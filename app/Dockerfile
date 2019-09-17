@@ -13,5 +13,4 @@ ADD . /app/
 WORKDIR /app/
 
 CMD ["python", "main.py"]
-#EXPOSE 0.0.0.0:3001:3001/tcp 
-
+#EXPOSE 0.0.0.0:3001:3001/tcp
