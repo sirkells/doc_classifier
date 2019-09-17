@@ -4,7 +4,7 @@ from flask import Flask, flash, Blueprint
 from flask import render_template, request, jsonify, url_for, redirect
 import re, pickle
 import time, os
-
+from flask_restful import Api, Resource
 
 from models import (
     predict_and_recommend,
@@ -25,7 +25,7 @@ subpath = os.environ.get("SUB_PATH")
 app = Flask(__name__)
 # app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
 app.secret_key = "secret"
-
+api = Api(app)
 # def get_path(name):
 #   subpath = os.environ.get('SUB_PATH')
 #  route = url_for(name)
@@ -74,6 +74,21 @@ def home():
 @app.route("/about")
 def about():
     return render_template("about.html")
+
+
+class RecommenededProjects(Resource):
+    def post(self):
+        postedData = request.get_json()
+        query = postedData["skills"]
+        labels, projects = predict_and_recommend(query)
+        projects = projects.to_dict(orient="records")
+
+        bereich = {"Bereich": labels}
+        projects.insert(0, bereich)
+        return jsonify(projects)
+
+
+api.add_resource(RecommenededProjects, "/api")
 
 
 def main():
