@@ -6,64 +6,69 @@ import re, pickle
 import time, os
 
 
-from models import predict_and_recommend, topic_names, text_processing, PrefixMiddleware, prefix_route
+from models import (
+    predict_and_recommend,
+    topic_names,
+    text_processing,
+    PrefixMiddleware,
+    prefix_route,
+)
 
-PREFIX = '/prod/doc_classifier'
-#bp = Blueprint('doc_clasifier', __name__, template_folder='templates')
-#app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
-subpath = os.environ.get('SUB_PATH')
+PREFIX = "/prod/doc_classifier"
+# bp = Blueprint('doc_clasifier', __name__, template_folder='templates')
+# app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
+subpath = os.environ.get("SUB_PATH")
 
 
-#app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
-#app.route = prefix_route(app.route, PREFIX)
+# app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
+# app.route = prefix_route(app.route, PREFIX)
 app = Flask(__name__)
-#app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
-app.secret_key = 'secret'
+# app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
+app.secret_key = "secret"
 
-#def get_path(name):
- #   subpath = os.environ.get('SUB_PATH')
-  #  route = url_for(name)
-    #fullpath = subpath + route
-   # return fullpath
+# def get_path(name):
+#   subpath = os.environ.get('SUB_PATH')
+#  route = url_for(name)
+# fullpath = subpath + route
+# return fullpath
 
-#app.jinja_env.globals.update(get_path=get_path)
+# app.jinja_env.globals.update(get_path=get_path)
 
 
-#@app.route("/")
-#def index():
-   # return redirect(url_for("home"))
-@app.route('/')
-@app.route('/home')
+# @app.route("/")
+# def index():
+# return redirect(url_for("home"))
+@app.route("/")
+@app.route("/home")
 def home():
     # save user input in query
     print(subpath)
-    query = request.args.get('query', '')
+    query = request.args.get("query", "")
     labels, recommended_projects = predict_and_recommend(query)
     valid_query = True if len(query) > 30 else False
     if valid_query:
         cleaned_text = text_processing(query)
         print(cleaned_text)
         return render_template(
-       	'home2.html',
-       	query=query,
-        valid_query=valid_query,
-        cleaned_text=cleaned_text,
-        labels=labels,
-        group=topic_names,
-        recommended_projects=recommended_projects
-    )
-        
+            "home.html",
+            query=query,
+            valid_query=valid_query,
+            cleaned_text=cleaned_text,
+            labels=labels,
+            group=topic_names,
+            recommended_projects=recommended_projects,
+        )
+
     else:
-        query = 'Please enter a valid text'
+        query = "Please enter a valid text"
         flash(query)
         return render_template(
-        'home2.html',
-        query=query,
-        labels={},
-        group={},
-        recommended_projects= pd.DataFrame(columns=['Text', 'title', 'description'])
-    )
-    	
+            "home.html",
+            query=query,
+            labels={},
+            group={},
+            recommended_projects=pd.DataFrame(columns=["Text", "title", "description"]),
+        )
 
 
 @app.route("/about")
@@ -71,10 +76,9 @@ def about():
     return render_template("about.html")
 
 
-
 def main():
-    app.run(host='0.0.0.0', port=3001, debug=False)
+    app.run(host="0.0.0.0", port=3001, debug=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
