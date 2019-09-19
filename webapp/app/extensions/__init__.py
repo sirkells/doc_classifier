@@ -14,31 +14,32 @@ from gensim.utils import SaveLoad
 import string
 from string import punctuation
 
+
 # load target data
-pickle_in = open("App-Model/stopwords_all.pickle", "rb")
+pickle_in = open("models/stopwords_all.pickle", "rb")
 stopwords_all = pickle.load(pickle_in)
 
 
 # Get Dictionary of the Trained Data
-with open("App-Model/dictionary", "rb") as data:
+with open("models/dictionary", "rb") as data:
     dictionary = pickle.load(data)
 
 # Get Projects data
-with open("App-Model/df", "rb") as data:
+with open("models/df", "rb") as data:
     projects = pickle.load(data)
 
 # projects.drop_duplicates(subset='description', inplace=True)
 # Get corpus
-with open("App-Model/corpus", "rb") as data:
+with open("models/corpus", "rb") as data:
     corpus = pickle.load(data)
 
 # load flatlist of skills
-with open("App-Model/flatlist", "rb") as data:
+with open("models/flatlist", "rb") as data:
     all_skills = pickle.load(data)
 
 
 # later on, load trained model from file
-lda_model = models.LdaModel.load("App-Model/converted_model_skills_title_26_pref")
+lda_model = models.LdaModel.load("models/converted_model_skills_title_26_pref")
 all_topic_distr_list = lda_model[corpus]
 
 topic_names = [
@@ -71,7 +72,7 @@ topic_names = [
 ]
 
 
-load_bigrams = SaveLoad.load("App-Model/bigram_skills_title")
+load_bigrams = SaveLoad.load("models/bigram_skills_title")
 
 
 def text_processing(text):

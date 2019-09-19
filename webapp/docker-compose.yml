@@ -1,15 +1,16 @@
-version: "3"
+version: "2"
 
 services:
 
   doc_classifier:
-    build: ./app
+    build: .
     container_name: doc_classifier
     restart: always
     environment:
       - APP_NAME=DocClassifierApp
       - SUB_PATH=/prod/doc_classifier
+      - FLASK_CONFIG=work
     ports:
       - "3001:3001"
     volumes:
-      - './app:/app'
+      - .:/webapp

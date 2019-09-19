@@ -5,8 +5,9 @@ from flask import render_template, request, jsonify, url_for, redirect
 import re, pickle
 import time, os
 from flask_restful import Api, Resource
+from app import app
 
-from models import (
+from app.extensions import (
     predict_and_recommend,
     topic_names,
     text_processing,
@@ -14,35 +15,13 @@ from models import (
     prefix_route,
 )
 
-PREFIX = "/prod/doc_classifier"
-# bp = Blueprint('doc_clasifier', __name__, template_folder='templates')
-# app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
-subpath = os.environ.get("SUB_PATH")
-
-
-# app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix='/prod/doc_classifier')
-# app.route = prefix_route(app.route, PREFIX)
-app = Flask(__name__)
-# app.register_blueprint(bp, url_prefix='/prod/doc_classifier')
-app.secret_key = "secret"
 api = Api(app)
-# def get_path(name):
-#   subpath = os.environ.get('SUB_PATH')
-#  route = url_for(name)
-# fullpath = subpath + route
-# return fullpath
-
-# app.jinja_env.globals.update(get_path=get_path)
 
 
-# @app.route("/")
-# def index():
-# return redirect(url_for("home"))
 @app.route("/")
 @app.route("/home")
 def home():
     # save user input in query
-    print(subpath)
     query = request.args.get("query", "")
     labels, recommended_projects = predict_and_recommend(query)
     valid_query = True if len(query) > 30 else False
@@ -76,6 +55,9 @@ def about():
     return render_template("about.html")
 
 
+# API
+
+
 class RecommenededProjects(Resource):
     def post(self):
         postedData = request.get_json()
@@ -87,13 +69,11 @@ class RecommenededProjects(Resource):
         projects.insert(0, bereich)
         return jsonify(projects)
 
+    def get(self):
+        respJson = {
+            "message": "This route only receives POST requets. Please send your request in JSON format"
+        }
+        return jsonify(respJson)
+
 
 api.add_resource(RecommenededProjects, "/api")
-
-
-def main():
-    app.run(host="0.0.0.0", port=3001, debug=False)
-
-
-if __name__ == "__main__":
-    main()
