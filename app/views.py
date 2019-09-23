@@ -16,10 +16,13 @@ from app.extensions import (
 )
 
 api = Api(app)
+path = os.getenv("SUB_PATH")
 
-
-@app.route("/")
-@app.route("/home")
+@app.route(path+"/")
+def index():
+    return redirect(url_for('home'))
+@app.route(path+"/")
+@app.route(path+"/home")
 def home():
     # save user input in query
     query = request.args.get("query", "")
@@ -50,7 +53,7 @@ def home():
         )
 
 
-@app.route("/about")
+@app.route(os.getenv("SUB_PATH")+"/about")
 def about():
     return render_template("about.html")
 
@@ -76,4 +79,4 @@ class RecommenededProjects(Resource):
         return jsonify(respJson)
 
 
-api.add_resource(RecommenededProjects, "/api")
+api.add_resource(RecommenededProjects, path+"/api")
