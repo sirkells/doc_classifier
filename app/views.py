@@ -21,9 +21,9 @@ path = os.getenv("SUB_PATH")
 #@app.route("/")
 #def index():
  #   return redirect(url_for('home'))
+
 @app.route("/")
-@app.route(path+"/")
-@app.route(path+"/home")
+@app.route("/home")
 def home():
     # save user input in query
     query = request.args.get("query", "")
@@ -54,7 +54,7 @@ def home():
         )
 
 
-@app.route(os.getenv("SUB_PATH")+"/about")
+@app.route("/about")
 def about():
     return render_template("about.html")
 
@@ -80,4 +80,4 @@ class RecommenededProjects(Resource):
         return jsonify(respJson)
 
 
-api.add_resource(RecommenededProjects, path+"/api")
+api.add_resource(RecommenededProjects, "/api")
