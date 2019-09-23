@@ -8,7 +8,7 @@ services:
     restart: always
     environment:
       - APP_NAME=DocClassifierApp
-      - SUB_PATH=/inte/doc_classifier
+      - SUB_PATH=/doc_classifier
       - FLASK_CONFIG=work
     ports:
       - "3001:3001"
