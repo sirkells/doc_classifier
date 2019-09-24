@@ -18,6 +18,7 @@ from app.extensions import (
 api = Api(app)
 path = os.getenv("SUB_PATH")
 
+
 #@app.route("/")
 #def index():
  #   return redirect(url_for('home'))
