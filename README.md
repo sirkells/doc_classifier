@@ -1,8 +1,8 @@
 
 # Document Classifier & Recommeneder System  ![Build Status](https://gitlab.actgruppe.de/kIgbokwe/doc_classifier/badges/master/pipeline.svg)
 
-> A web app that uses a trained Machine Learning model to classify IT projects by types (e.g: Web dev, Data Engr, Devops, etc) and recommends similar projects to the user
-> The model was trained using the projectfinder data and the code and processes involved can be found [here](https://gitlab.actgruppe.de/data-science-projects/projectfinder_analytics)
+> A web app that takes an IT based project description and predicts its category (e.g: Web dev, Data Engr, Devops, etc) and recommends similar projects to the user using a previously trained Machine Learning model  
+> The Machine Learning model was trained using the projectfinder data and the code and approach involved can be found [here](https://gitlab.actgruppe.de/data-science-projects/projectfinder_analytics)
 
 ## Table of contents
 
