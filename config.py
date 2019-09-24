@@ -18,11 +18,7 @@ class DevConfig(Config):
     TESTING = False
     DEBUG = True
 
-    MONGODB_SETTINGS = {
-        "db": "projectfinder",
-        "host": os.getenv("MONGO_HOST"),
-        "port": int(os.getenv("MONGO_PORT", "27017")),
-    }
+ 
 
 
 class TestConfig(Config):
@@ -30,11 +26,7 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = True
 
-    MONGODB_SETTINGS = {
-        "db": "projectfinder-test",
-        "host": os.getenv("MONGO_HOST", "mongo"),
-        "port": int(os.getenv("MONGO_PORT", "27017")),
-    }
+
 
 
 class WorkingConfig(Config):
@@ -42,12 +34,7 @@ class WorkingConfig(Config):
     TESTING = False
     DEBUG = False
 
-    # persistence layer
-    MONGODB_SETTINGS = {
-        "db": "projectfinder",
-        "host": os.getenv("MONGO_HOST", "10.10.250.0"),
-        "port": int(os.getenv("MONGO_PORT", "27017")),
-    }
+
 
 
 config = {
