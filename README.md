@@ -1,5 +1,5 @@
 
-# Document Classifier & Recommeneder System [(https://gitlab.actgruppe.de/kIgbokwe/doc_classifier/badges/master/pipeline.svg)]
+# Document Classifier & Recommeneder System  [![Build Status](https://gitlab.actgruppe.de/kIgbokwe/doc_classifier/badges/master/pipeline.svg)]
 
 > A web app that classifies IT projects and recommends similar projects
 
