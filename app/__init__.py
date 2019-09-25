@@ -1,7 +1,7 @@
 from flask import Flask
 from config import config
 import os
-
+from flask_cors import CORS
 
 def sub_path(path):
     new_path = os.getenv("SUB_PATH") + path
@@ -17,6 +17,7 @@ def create_app(config_name):
 
 
 app = create_app(os.getenv("FLASK_CONFIG") or "default")
+CORS(app, resources={r"/api*": {"origins": "*"}})
 app.jinja_env.globals.update(sub_path=sub_path)
 
 from . import views

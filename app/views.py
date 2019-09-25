@@ -10,9 +10,8 @@ from app import app
 from app.extensions import (
     predict_and_recommend,
     topic_names,
-    text_processing,
-    PrefixMiddleware,
-    prefix_route,
+    text_processing
+
 )
 
 api = Api(app)
