@@ -18,8 +18,6 @@ class DevConfig(Config):
     TESTING = False
     DEBUG = True
 
- 
-
 
 class TestConfig(Config):
     # properties
@@ -27,14 +25,10 @@ class TestConfig(Config):
     DEBUG = True
 
 
-
-
 class WorkingConfig(Config):
     # properties
     TESTING = False
     DEBUG = False
-
-
 
 
 config = {

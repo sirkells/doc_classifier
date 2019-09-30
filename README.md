@@ -10,6 +10,7 @@
 - [Technologies](#technologies)
 - [Setup](#setup)
 - [Docker](#docker)
+- [API](#api)
 
 
 
@@ -51,4 +52,13 @@ To setup using Docker:
 - cd into the project
 - run `docker-compose up` in your terminal to setup, build and run image. This may take some time to complete
 - When complete go to your localhost on port 3001
+
+## API
+
+To use the API:
+
+- The API route is `/api`
+- Make sure app server is running
+- Send a POST request in JSON format. Example: `{ "skills": "python, hadoop, spark, big data, docker" }`
+- ![Example API Response screenshot](./img/doc_classifier.PNG)
 

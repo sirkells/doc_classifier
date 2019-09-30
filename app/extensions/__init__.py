@@ -14,6 +14,36 @@ from gensim.utils import SaveLoad
 import string
 from string import punctuation
 
+from pymongo import MongoClient
+
+
+def connect():
+    connection = MongoClient("10.10.250.10", 27017)
+    handle = connection["projectfinder"]
+    return handle
+
+
+db = connect()
+
+
+def load_data_from_momgodb():
+    exclude_data = {"_id": False}
+    raw_data = list(db.itproject_region_bereich.find({}, projection=exclude_data))
+    dataset = pd.DataFrame(raw_data)
+    # select colunms
+    dataset = dataset[
+        ["title", "description", "bereich", "rec_bereich", "skill_summary"]
+    ]
+    dataset = dataset[dataset["description"] != ""]
+    dataset = pd.concat(
+        [
+            dataset.drop(["rec_bereich"], axis=1),
+            dataset["rec_bereich"].apply(pd.Series),
+        ],
+        axis=1,
+    )
+    return dataset
+
 
 # load target data
 pickle_in = open("models/stopwords_all.pickle", "rb")
@@ -41,6 +71,7 @@ with open("models/flatlist", "rb") as data:
 # later on, load trained model from file
 lda_model = models.LdaModel.load("models/converted_model_skills_title_26_pref")
 all_topic_distr_list = lda_model[corpus]
+
 
 topic_names = [
     "IT_Support",
@@ -105,6 +136,12 @@ def percentage(data):
     perc_arr = np.array([(x / total) * 100 for x in data])
     return perc_arr
 
+def nonIT(score): 
+    #subtracts topic 1 score from topic 3. 
+    #if score is greater than 2, its an IT text else its nonIT
+    diff = score[0] - score[4]
+    #check = diff > 2
+    return diff > 2
 
 def predict_bereich(text, model=lda_model, topics=topic_names):
     # dictionary.add_documents([text_processing(text)])
@@ -115,7 +152,8 @@ def predict_bereich(text, model=lda_model, topics=topic_names):
     # model.update([bow])
     # get the topic contributions for the document chosen at random above
     topic_dist = model.get_document_topics(bow=bow)
-    doc_distribution = np.array([topic[1] for topic in topic_dist])
+    prob_dist = [topic[1] for topic in topic_dist]
+    doc_distribution = np.array(prob_dist)
 
     labels_array_percent = percentage(doc_distribution)
     # print(labels_array_percent)
@@ -123,53 +161,76 @@ def predict_bereich(text, model=lda_model, topics=topic_names):
     # print(topic_dist)
 
     index = doc_distribution.argmax()
+    
+    score = sorted([round(count*100,2) for count in prob_dist], reverse=True)
+
     topic1 = topics[labels_array[0]]
     topic2 = topics[labels_array[1]]
     topic3 = topics[labels_array[2]]
+    
+    # predicted_prob_distr = model.predict_proba([text])
+    # results = [val[0][1] for val in predicted_prob_distr]
+    # predicted_index = np.argmax(results)
+    # prediction_percentage = max(results)
 
     # print(labels_array[0], labels_array[1])
     # result = f'The project seems to be => {topic1} but could also be => {topic2}'
     # return result, topic1,topic2
-    return topic1, topic2, topic3
+    return topic1, topic2, topic3, score
 
 
 def predict_and_recommend(text_data):
-    bereich = predict_bereich(text_data)
-    rec_projects1 = projects[projects["category3"] == bereich]
-    rec_projects2 = projects[projects["category2"] == bereich[:2]]
-    combined_recommendations = pd.concat(
-        [rec_projects1, rec_projects2], ignore_index=True
+    bereich1, bereich2, bereich3, probability_percentage = predict_bereich(text_data)
+    bereich = (bereich1, bereich2, bereich3)
+    # category_all =  bereich1 +" "+ bereich2 + " " + bereich3
+    # category1 = bereich1 +" "+ bereich2
+    # category2 = bereich1 +" "+ bereich3
+    #bs1 = skills[topic_names.index(bereich1)]
+    #bs2 = skills[topic_names.index(bereich2)]
+    # rec_project = db.itproject_region_bereich.find({"$or":[{"bereich1": bereich1,"bereich2": bereich2, "bereich3": bereich3}, {"bereich1": bereich1,"bereich2": bereich2}]})
+    # new = list({project['title'] for project in rec_project})
+    rec_project2 = [
+        project
+        for project in db.itproject_region_bereich.find(
+            {
+                "$and": [
+                    {"bereich1": bereich1},
+                    {"bereich2": bereich2},
+                    {"bereich3": bereich3},
+                ]
+            }, {'_id': False,"tech_summary":False, "summary":False}
+        )
+    ]
+    rec_project3 = [
+        project
+        for project in db.itproject_region_bereich.find(
+            {"$and": [{"bereich1": bereich1}, {"bereich2": bereich2}]}, {'_id': False, "tech_summary":False, "summary":False}
+        )
+    ]
+    rec_project4 = [
+    project
+    for project in db.itproject_region_bereich.find(
+        {"bereich1": bereich1}, {'_id': False, "tech_summary":False, "summary":False}
     )
-    combined_recommendations.drop_duplicates(subset="title", inplace=True)
+]
+    rec_project = (rec_project3[:11] + rec_project2 + rec_project4)
+    # data = load_data_from_momgodb()
+    # rec_projects1 = data[data["category_all"] == category_all]
+    # rec_projects2 = data[data["category1"] == category1]
+    # rec_projects3 = data[data["category2"] == category2]
+    # rec_projects1 = projects[projects["category3"] == bereich]
+    # rec_projects2 = projects[projects["category2"] == bereich[:2]]
+    # combined_recommendations = pd.concat(
+    # [rec_projects1, rec_projects2, rec_projects3[:5]], ignore_index=True
+    # )
+    # combined_recommendations.drop_duplicates(subset="title", inplace=True)
 
-    return bereich, combined_recommendations
-
-
-class PrefixMiddleware(object):
-    def __init__(self, app, prefix=""):
-        self.app = app
-        self.prefix = prefix
-
-    def __call__(self, environ, start_response):
-
-        if environ["PATH_INFO"].startswith(self.prefix):
-            environ["PATH_INFO"] = environ["PATH_INFO"][len(self.prefix) :]
-            environ["SCRIPT_NAME"] = self.prefix
-            return self.app(environ, start_response)
-        else:
-            start_response("404", [("Content-Type", "text/plain")])
-            return ["This url does not belong to the app.".encode()]
+    return bereich, rec_project[:20], probability_percentage
 
 
-def prefix_route(route_function, prefix="", mask="{0}{1}"):
-    """
-    Defines a new route function with a prefix.
-    The mask argument is a `format string` formatted with, in that order:
-      prefix, route
-  """
-
-    def newroute(route, *args, **kwargs):
-        """New function to prefix the route"""
-        return route_function(mask.format(prefix, route), *args, **kwargs)
-
-    return newroute
+def get_category_prob(text, model=lda_model, labels=topic_names):
+    predicted_prob_distr = model.predict_proba([text])
+    results = [val[0][1] for val in predicted_prob_distr]
+    predicted_index = np.argmax(results)
+    prediction_percentage = max(results)
+    return labels[predicted_index], prediction_percentage
