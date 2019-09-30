@@ -71,12 +71,13 @@ class RecommenededProjects(Resource):
         query = postedData["skills"]
         valid_query = True if len(query) > 30 else False
         cleaned_text = text_processing(query)
-        if valid_query and len(cleaned_text) > 1:
-            labels, projects = predict_and_recommend(query)
+        labels, recommended_projects, probability_percentage = predict_and_recommend(query)
+        if valid_query and len(cleaned_text) > 1 and nonIT(probability_percentage):
+            #labels, projects = predict_and_recommend(query)
             #projects = projects.to_dict(orient="records")
             #bereich = {"Bereich": labels}
             #projects.insert(0, bereich)
-            return jsonify(projects)
+            return jsonify(recommended_projects)
         else:
             respJson = {
             "message": "Please enter a valid text"
