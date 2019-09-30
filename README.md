@@ -60,5 +60,5 @@ To use the API:
 - The API route is `/api`
 - Make sure app server is running
 - Send a POST request in JSON format. Example: `{ "skills": "python, hadoop, spark, big data, docker" }`
-- ![Example API Response screenshot](./img/doc_classifier.PNG)
+- ![Example API Response screenshot](./img/api_response.PNG)
 
