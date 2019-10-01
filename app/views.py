@@ -1,7 +1,7 @@
 import json, re
 import pandas as pd
 from flask import Flask, flash, Blueprint
-from flask import render_template, request, jsonify, url_for, redirect
+from flask import render_template, request, jsonify, url_for, redirect, Response
 import re, pickle
 import time, os
 from flask_restful import Api, Resource
@@ -79,16 +79,18 @@ class RecommenededProjects(Resource):
             #projects.insert(0, bereich)
             return jsonify(recommended_projects)
         else:
-            respJson = {
-            "message": "Please enter a valid text"
-        }
-            return jsonify(respJson)
+            respJson = json.dumps({"message": "Please enter a valid text"})
 
-    def get(self):
-        respJson = {
-            "message": "This route only receives POST requets. Please send your request in JSON format"
-        }
-        return jsonify(respJson)
+            return Response(respJson, status=409, mimetype='application/json')
+            #return jsonify(respJson), 409
+
+
+    # def get(self):
+    #     respJson = {
+    #         "message": "This route only receives POST requests. Please send your request in JSON format",
+    #         "status": 400
+    #     }
+    #     return Response(jsonify(respJson), status=401, mimetype='application/json')
 
 
 api.add_resource(RecommenededProjects, "/api")

@@ -141,7 +141,7 @@ def nonIT(score):
     #if score is greater than 2, its an IT text else its nonIT
     diff = score[0] - score[4]
     #check = diff > 2
-    return diff > 2
+    return diff > 1.5
 
 def predict_bereich(text, model=lda_model, topics=topic_names):
     # dictionary.add_documents([text_processing(text)])
@@ -157,7 +157,7 @@ def predict_bereich(text, model=lda_model, topics=topic_names):
 
     labels_array_percent = percentage(doc_distribution)
     # print(labels_array_percent)
-    labels_array = labels_array_percent.argsort()[-3:][::-1]
+    labels_array = labels_array_percent.argsort()[-4:][::-1]
     # print(topic_dist)
 
     index = doc_distribution.argmax()
@@ -167,6 +167,7 @@ def predict_bereich(text, model=lda_model, topics=topic_names):
     topic1 = topics[labels_array[0]]
     topic2 = topics[labels_array[1]]
     topic3 = topics[labels_array[2]]
+    topic4 = topics[labels_array[3]]
     
     # predicted_prob_distr = model.predict_proba([text])
     # results = [val[0][1] for val in predicted_prob_distr]
@@ -176,12 +177,12 @@ def predict_bereich(text, model=lda_model, topics=topic_names):
     # print(labels_array[0], labels_array[1])
     # result = f'The project seems to be => {topic1} but could also be => {topic2}'
     # return result, topic1,topic2
-    return topic1, topic2, topic3, score
+    return topic1, topic2, topic3, topic4, score
 
 
 def predict_and_recommend(text_data):
-    bereich1, bereich2, bereich3, probability_percentage = predict_bereich(text_data)
-    bereich = (bereich1, bereich2, bereich3)
+    bereich1, bereich2, bereich3, bereich4, probability_percentage = predict_bereich(text_data)
+    bereich = (bereich1, bereich2, bereich3, bereich4)
     # category_all =  bereich1 +" "+ bereich2 + " " + bereich3
     # category1 = bereich1 +" "+ bereich2
     # category2 = bereich1 +" "+ bereich3
