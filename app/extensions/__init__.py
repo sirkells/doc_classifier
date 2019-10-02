@@ -64,7 +64,7 @@ with open("models/corpus", "rb") as data:
     corpus = pickle.load(data)
 
 # load flatlist of skills
-with open("models/flatlist", "rb") as data:
+with open("models/flatlist1", "rb") as data:
     all_skills = pickle.load(data)
 
 
@@ -121,7 +121,7 @@ def text_processing(text):
         text = re.sub("[%s]" % re.escape(string.punctuation), " ", text)
         tokens = word_tokenize(text)
         tokens_cleaned = [
-            word for word in tokens if word not in stopwords_all and len(word) > 1
+            word for word in tokens if word not in stopwords_all
         ]
         bigrams_tokens = load_bigrams[tokens_cleaned]
         tokens = list({token for token in bigrams_tokens if token in all_skills})
@@ -190,43 +190,102 @@ def predict_and_recommend(text_data):
     #bs2 = skills[topic_names.index(bereich2)]
     # rec_project = db.itproject_region_bereich.find({"$or":[{"bereich1": bereich1,"bereich2": bereich2, "bereich3": bereich3}, {"bereich1": bereich1,"bereich2": bereich2}]})
     # new = list({project['title'] for project in rec_project})
-    rec_project2 = [
-        project
-        for project in db.itproject_region_bereich.find(
-            {
-                "$and": [
-                    {"bereich1": bereich1},
-                    {"bereich2": bereich2},
-                    {"bereich3": bereich3},
-                ]
-            }, {'_id': False,"tech_summary":False, "summary":False}
-        )
-    ]
-    rec_project3 = [
-        project
-        for project in db.itproject_region_bereich.find(
-            {"$and": [{"bereich1": bereich1}, {"bereich2": bereich2}]}, {'_id': False, "tech_summary":False, "summary":False}
-        )
-    ]
-    rec_project4 = [
-    project
-    for project in db.itproject_region_bereich.find(
-        {"bereich1": bereich1}, {'_id': False, "tech_summary":False, "summary":False}
-    )
-]
-    rec_project = (rec_project3[:11] + rec_project2 + rec_project4)
-    # data = load_data_from_momgodb()
-    # rec_projects1 = data[data["category_all"] == category_all]
-    # rec_projects2 = data[data["category1"] == category1]
-    # rec_projects3 = data[data["category2"] == category2]
-    # rec_projects1 = projects[projects["category3"] == bereich]
-    # rec_projects2 = projects[projects["category2"] == bereich[:2]]
-    # combined_recommendations = pd.concat(
-    # [rec_projects1, rec_projects2, rec_projects3[:5]], ignore_index=True
-    # )
-    # combined_recommendations.drop_duplicates(subset="title", inplace=True)
+    ba = ("data_analysis", "excel", "r", "python")
+    analyst1 = ba[0] and ba[1] and ba[2] in text_data
+    analyst2 = ba[0] and ba[2] and ba[3] in text_data
+    isAnalyst = analyst1 or analyst2
 
-    return bereich, rec_project[:20], probability_percentage
+    if isAnalyst:
+        analystBereich = (topic_names[14], topic_names[22], topic_names[20])
+        rec_project1 = [
+                project
+                for project in db.itproject_region_bereich.find(
+                    {"$and": [{"bereich1": topic_names[14]}, {"bereich2": topic_names[22]}]}, {'_id': False, "tech_summary":False, "summary":False}
+                )
+            ]
+        rec_project2 = [
+            project
+            for project in db.itproject_region_bereich.find(
+                {
+                    "$and": [
+                        {"bereich1": topic_names[22]},
+                        {"bereich2": topic_names[14]},
+                        {"bereich3": topic_names[20]},
+                    ]
+                }, {'_id': False,"tech_summary":False, "summary":False}
+            )
+            ]
+        rec_project3 = [
+                project
+                for project in db.itproject_region_bereich.find(
+                    {"$and": [{"bereich1": topic_names[22]}, {"bereich2": topic_names[14]}]}, {'_id': False, "tech_summary":False, "summary":False}
+                )
+            ]
+        rec_project4 = [
+            project
+            for project in db.itproject_region_bereich.find(
+                {
+                    "$and": [
+                        {"bereich1": topic_names[14]},
+                        {"bereich2": topic_names[22]},
+                        {"bereich3": topic_names[20]},
+                    ]
+                }, {'_id': False,"tech_summary":False, "summary":False}
+            )
+            ]
+        rec_project5 = [
+            project
+            for project in db.itproject_region_bereich.find(
+                {
+                    "$and": [
+                        {"bereich1": topic_names[17]},
+                        {"bereich2": topic_names[14]},
+                        {"bereich3": topic_names[22]},
+                    ]
+                }, {'_id': False,"tech_summary":False, "summary":False}
+            )
+            ]
+        rec_project = (rec_project1 + rec_project2 + rec_project3 + rec_project4 + rec_project5)
+        return analystBereich, rec_project, probability_percentage
+
+    else:
+        rec_project2 = [
+            project
+            for project in db.itproject_region_bereich.find(
+                {
+                    "$and": [
+                        {"bereich1": bereich1},
+                        {"bereich2": bereich2},
+                        {"bereich3": bereich3},
+                    ]
+                }, {'_id': False,"tech_summary":False, "summary":False}
+            )
+        ]
+        rec_project3 = [
+            project
+            for project in db.itproject_region_bereich.find(
+                {"$and": [{"bereich1": bereich1}, {"bereich2": bereich2}]}, {'_id': False, "tech_summary":False, "summary":False}
+            )
+        ]
+        rec_project4 = [
+        project
+        for project in db.itproject_region_bereich.find(
+            {"bereich1": bereich1}, {'_id': False, "tech_summary":False, "summary":False}
+        )
+    ]
+        rec_project = (rec_project3[:10] + rec_project2 + rec_project4)
+        # data = load_data_from_momgodb()
+        # rec_projects1 = data[data["category_all"] == category_all]
+        # rec_projects2 = data[data["category1"] == category1]
+        # rec_projects3 = data[data["category2"] == category2]
+        # rec_projects1 = projects[projects["category3"] == bereich]
+        # rec_projects2 = projects[projects["category2"] == bereich[:2]]
+        # combined_recommendations = pd.concat(
+        # [rec_projects1, rec_projects2, rec_projects3[:5]], ignore_index=True
+        # )
+        # combined_recommendations.drop_duplicates(subset="title", inplace=True)
+
+        return bereich, rec_project[:20], probability_percentage
 
 
 def get_category_prob(text, model=lda_model, labels=topic_names):
