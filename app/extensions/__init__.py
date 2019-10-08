@@ -235,3 +235,6 @@ def get_category_prob(text, model=lda_model, labels=topic_names):
     predicted_index = np.argmax(results)
     prediction_percentage = max(results)
     return labels[predicted_index], prediction_percentage
+
+
+
