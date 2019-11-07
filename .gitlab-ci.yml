@@ -27,7 +27,7 @@ master_image:
  script:
    - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION-$CI_COMMIT_REF_NAME
    - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION-$CI_COMMIT_REF_NAME
-   - docker tag webproxy:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/doc_classifier_webproxy:$APP_VERSION-$CI_COMMIT_REF_NAME
+   - docker tag doc_classifier_webproxy:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/doc_classifier_webproxy:$APP_VERSION-$CI_COMMIT_REF_NAME
    - docker push docker-registry.actgruppe.de/$APP_PATH/doc_classifier_webproxy:$APP_VERSION-$CI_COMMIT_REF_NAME
  only:
    - master
