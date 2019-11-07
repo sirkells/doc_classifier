@@ -12,7 +12,7 @@ services:
 
 
   webproxy:
-    image: docker-registry.actgruppe.de/apps/doc_classifier_webproxy:${APP_VERSION}-$CI_COMMIT_REF_NAME
+    image: docker-registry.actgruppe.de/apps/webproxy:${APP_VERSION}-$CI_COMMIT_REF_NAME
     depends_on:
       - "app"
     networks:
