@@ -1,14 +1,31 @@
-version: "2"
+version: "3"
 
 services:
-
   doc_classifier:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: doc_classifier:local
     container_name: doc_classifier
-    restart: always
     environment:
       - APP_NAME=DocClassifierApp
       - SUB_PATH=/
       - FLASK_CONFIG=work
+    networks:
+      web:
+
+  webproxy:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: doc_classifier_proxy:local
+    depends_on:
+      - "doc_classifier"
     ports:
-      - "3001:3001"
+      - "80:80"
+    networks:
+      web:
+
+networks:
+  web:
+    external: true

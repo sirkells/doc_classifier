@@ -1,19 +1,12 @@
 import pandas as pd
 import numpy as np
-import re, pickle, time, json
-
-import nltk
+import re
+import pickle
 from nltk.tokenize import word_tokenize
-from sklearn.externals import joblib
 
-import gensim
-from gensim.models import LdaModel
-from gensim import models, corpora, similarities
+from gensim import models
 from gensim.utils import SaveLoad
-
 import string
-from string import punctuation
-
 from pymongo import MongoClient
 
 
@@ -136,12 +129,14 @@ def percentage(data):
     perc_arr = np.array([(x / total) * 100 for x in data])
     return perc_arr
 
-def nonIT(score): 
-    #subtracts topic 1 score from topic 3. 
-    #if score is greater than 2, its an IT text else its nonIT
+
+def nonIT(score):
+    # subtracts topic 1 score from topic 3.
+    # if score is greater than 2, its an IT text else its nonIT
     diff = score[0] - score[4]
-    #check = diff > 2
+    # check = diff > 2
     return diff > 1.5
+
 
 def predict_bereich(text, model=lda_model, topics=topic_names):
     # dictionary.add_documents([text_processing(text)])
@@ -161,14 +156,14 @@ def predict_bereich(text, model=lda_model, topics=topic_names):
     # print(topic_dist)
 
     index = doc_distribution.argmax()
-    
-    score = sorted([round(count*100,2) for count in prob_dist], reverse=True)
+
+    score = sorted([round(count * 100, 2) for count in prob_dist], reverse=True)
 
     topic1 = topics[labels_array[0]]
     topic2 = topics[labels_array[1]]
     topic3 = topics[labels_array[2]]
     topic4 = topics[labels_array[3]]
-    
+
     # predicted_prob_distr = model.predict_proba([text])
     # results = [val[0][1] for val in predicted_prob_distr]
     # predicted_index = np.argmax(results)
@@ -181,15 +176,10 @@ def predict_bereich(text, model=lda_model, topics=topic_names):
 
 
 def predict_and_recommend(text_data):
-    bereich1, bereich2, bereich3, bereich4, probability_percentage = predict_bereich(text_data)
+    bereich1, bereich2, bereich3, bereich4, probability_percentage = predict_bereich(
+        text_data
+    )
     bereich = (bereich1, bereich2, bereich3, bereich4)
-    # category_all =  bereich1 +" "+ bereich2 + " " + bereich3
-    # category1 = bereich1 +" "+ bereich2
-    # category2 = bereich1 +" "+ bereich3
-    #bs1 = skills[topic_names.index(bereich1)]
-    #bs2 = skills[topic_names.index(bereich2)]
-    # rec_project = db.itproject_region_bereich.find({"$or":[{"bereich1": bereich1,"bereich2": bereich2, "bereich3": bereich3}, {"bereich1": bereich1,"bereich2": bereich2}]})
-    # new = list({project['title'] for project in rec_project})
     rec_project2 = [
         project
         for project in db.itproject_region_bereich.find(
@@ -199,32 +189,25 @@ def predict_and_recommend(text_data):
                     {"bereich2": bereich2},
                     {"bereich3": bereich3},
                 ]
-            }, {'_id': False,"tech_summary":False, "summary":False}
+            },
+            {"_id": False, "tech_summary": False, "summary": False},
         )
     ]
     rec_project3 = [
         project
         for project in db.itproject_region_bereich.find(
-            {"$and": [{"bereich1": bereich1}, {"bereich2": bereich2}]}, {'_id': False, "tech_summary":False, "summary":False}
+            {"$and": [{"bereich1": bereich1}, {"bereich2": bereich2}]},
+            {"_id": False, "tech_summary": False, "summary": False},
         )
     ]
     rec_project4 = [
-    project
-    for project in db.itproject_region_bereich.find(
-        {"bereich1": bereich1}, {'_id': False, "tech_summary":False, "summary":False}
-    )
-]
-    rec_project = (rec_project3[:11] + rec_project2 + rec_project4)
-    # data = load_data_from_momgodb()
-    # rec_projects1 = data[data["category_all"] == category_all]
-    # rec_projects2 = data[data["category1"] == category1]
-    # rec_projects3 = data[data["category2"] == category2]
-    # rec_projects1 = projects[projects["category3"] == bereich]
-    # rec_projects2 = projects[projects["category2"] == bereich[:2]]
-    # combined_recommendations = pd.concat(
-    # [rec_projects1, rec_projects2, rec_projects3[:5]], ignore_index=True
-    # )
-    # combined_recommendations.drop_duplicates(subset="title", inplace=True)
+        project
+        for project in db.itproject_region_bereich.find(
+            {"bereich1": bereich1},
+            {"_id": False, "tech_summary": False, "summary": False},
+        )
+    ]
+    rec_project = rec_project3[:11] + rec_project2 + rec_project4
 
     return bereich, rec_project[:20], probability_percentage
 
@@ -235,6 +218,3 @@ def get_category_prob(text, model=lda_model, labels=topic_names):
     predicted_index = np.argmax(results)
     prediction_percentage = max(results)
     return labels[predicted_index], prediction_percentage
-
-
-

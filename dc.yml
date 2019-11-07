@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  app:
+    image: docker-registry.actgruppe.de/apps/doc_classifier:${APP_VERSION}-$CI_COMMIT_REF_NAME
+    environment:
+      - APP_NAME=Doc-Classifier
+      - SUB_PATH=/inte/doc_classifier/
+      - FLASK_CONFIG=work
+    networks:
+      - web
+
+
+  webproxy:
+    image: docker-registry.actgruppe.de/apps/doc_classifier_webproxy:${APP_VERSION}-$CI_COMMIT_REF_NAME
+    depends_on:
+      - "app"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

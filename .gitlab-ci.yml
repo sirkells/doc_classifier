@@ -1,11 +1,12 @@
 variables:
-  APP_VERSION: '1.5'
+  APP_VERSION: $CI_PIPELINE_IID
   BRANCH_NAME: $CI_COMMIT_REF_NAME
   IMAGE_NAME: $CI_PROJECT_NAME
   APP_PATH: 'apps'
 
 stages:
   - build
+  - registry
   - deploy
   - post
 
@@ -15,28 +16,31 @@ build:
     - shared
   script:
     - docker build -t $IMAGE_NAME:build-$CI_PIPELINE_ID .
-
-deploy:
-  stage: deploy
-  tags:
-    - shared
-  script:
-    - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
-    - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$BRANCH_NAME
-  except:
-    - master
-
-latest:
-  stage: deploy
-  tags:
-    - shared
-  script:
-    - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
-    - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION
-    - docker tag docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
-    - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:latest
+    - docker build -t doc_classifier_webproxy:build-$CI_PIPELINE_ID ./nginx
   only:
     - master
+
+master_image:
+ stage: registry
+ tags:
+    - shared
+ script:
+   - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION-$CI_COMMIT_REF_NAME
+   - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION-$CI_COMMIT_REF_NAME
+   - docker tag webproxy:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/doc_classifier_webproxy:$APP_VERSION-$CI_COMMIT_REF_NAME
+   - docker push docker-registry.actgruppe.de/$APP_PATH/doc_classifier_webproxy:$APP_VERSION-$CI_COMMIT_REF_NAME
+ only:
+   - master
+
+
+deployment:
+ stage: deploy
+ script:
+   - docker stack deploy -c ./dc.yml doc_classifier
+ tags:
+   - integration
+ only:
+  - master
 
 cleanup:
   stage: post
@@ -44,3 +48,6 @@ cleanup:
     - shared
   script:
     - docker rmi $IMAGE_NAME:build-$CI_PIPELINE_ID
+    - docker rmi webproxy:build-$CI_PIPELINE_ID
+    - docker rmi docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION-$CI_COMMIT_REF_NAME
+    - docker rmi docker-registry.actgruppe.de/$APP_PATH/doc_classifier_webproxy:$APP_VERSION-$CI_COMMIT_REF_NAME

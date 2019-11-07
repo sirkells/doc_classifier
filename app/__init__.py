@@ -5,8 +5,10 @@ from flask_cors import CORS
 
 
 def sub_path(path):
-    new_path = os.getenv("SUB_PATH") + path
-    return new_path
+    if path == "/":
+        return os.getenv("SUB_PATH")
+    else:
+        return os.getenv("SUB_PATH") + path
 
 
 def create_app(config_name):
@@ -17,10 +19,15 @@ def create_app(config_name):
 
     @app.after_request
     def inject_cors_header(response):
-       response.headers['Access-Control-Allow-Origin'] = '*'
-       response.headers['Access-Control-Allow-Methods'] = 'PUT, POST, PATCH, DELETE, GET'
-       response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization'  # noqa
-       return response
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers[
+            "Access-Control-Allow-Methods"
+        ] = "PUT, POST, PATCH, DELETE, GET"
+        response.headers[
+            "Access-Control-Allow-Headers"
+        ] = "Origin, X-Requested-With, Content-Type, Accept, Authorization"  # noqa
+        return response
+
     return app
 
 

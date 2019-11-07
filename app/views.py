@@ -32,7 +32,7 @@ def predict():
     valid_query = True if len(query) > 30 else False
     cleaned_text = text_processing(query)
     if valid_query and len(cleaned_text) > 1 and nonIT(probability_percentage):
-        
+
         print(cleaned_text)
         return render_template(
             "index.html",
@@ -42,7 +42,7 @@ def predict():
             labels=labels,
             group=topic_names,
             recommended_projects=recommended_projects,
-            probability_percentage=probability_percentage
+            probability_percentage=probability_percentage,
         )
 
     else:
@@ -71,19 +71,20 @@ class RecommenededProjects(Resource):
         query = postedData["skills"]
         valid_query = True if len(query) > 30 else False
         cleaned_text = text_processing(query)
-        labels, recommended_projects, probability_percentage = predict_and_recommend(query)
+        labels, recommended_projects, probability_percentage = predict_and_recommend(
+            query
+        )
         if valid_query and len(cleaned_text) > 1 and nonIT(probability_percentage):
-            #labels, projects = predict_and_recommend(query)
-            #projects = projects.to_dict(orient="records")
-            #bereich = {"Bereich": labels}
-            #projects.insert(0, bereich)
+            # labels, projects = predict_and_recommend(query)
+            # projects = projects.to_dict(orient="records")
+            # bereich = {"Bereich": labels}
+            # projects.insert(0, bereich)
             return jsonify(recommended_projects)
         else:
             respJson = json.dumps({"message": "Please enter a valid text"})
 
-            return Response(respJson, status=409, mimetype='application/json')
-            #return jsonify(respJson), 409
-
+            return Response(respJson, status=409, mimetype="application/json")
+            # return jsonify(respJson), 409
 
     # def get(self):
     #     respJson = {
