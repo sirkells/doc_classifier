@@ -48,6 +48,6 @@ cleanup:
     - shared
   script:
     - docker rmi $IMAGE_NAME:build-$CI_PIPELINE_ID
-    - docker rmi webproxy:build-$CI_PIPELINE_ID
+    - docker rmi doc_classifier_webproxy:build-$CI_PIPELINE_ID
     - docker rmi docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION-$CI_COMMIT_REF_NAME
     - docker rmi docker-registry.actgruppe.de/$APP_PATH/doc_classifier_webproxy:$APP_VERSION-$CI_COMMIT_REF_NAME
