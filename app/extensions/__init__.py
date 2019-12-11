@@ -11,7 +11,7 @@ from pymongo import MongoClient
 
 
 def connect():
-    connection = MongoClient("10.10.250.10", 27017)
+    connection = MongoClient("10.10.250.20", 27017)
     handle = connection["projectfinder"]
     return handle
 

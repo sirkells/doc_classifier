@@ -12,8 +12,6 @@ stages:
 
 build:
   stage: build
-  tags:
-    - shared
   script:
     - docker build -t $IMAGE_NAME:build-$CI_PIPELINE_ID .
     - docker build -t doc_classifier_webproxy:build-$CI_PIPELINE_ID ./nginx
@@ -22,8 +20,6 @@ build:
 
 master_image:
  stage: registry
- tags:
-    - shared
  script:
    - docker tag $IMAGE_NAME:build-$CI_PIPELINE_ID docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION-$CI_COMMIT_REF_NAME
    - docker push docker-registry.actgruppe.de/$APP_PATH/$IMAGE_NAME:$APP_VERSION-$CI_COMMIT_REF_NAME
@@ -44,8 +40,6 @@ deployment:
 
 cleanup:
   stage: post
-  tags:
-    - shared
   script:
     - docker rmi $IMAGE_NAME:build-$CI_PIPELINE_ID
     - docker rmi doc_classifier_webproxy:build-$CI_PIPELINE_ID
